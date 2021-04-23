@@ -46,7 +46,7 @@ layout: true
 ---
 name: ATL-title
 class: inverse,left, middle
-background-image: url(https://github.com/barryquinn1/quinnference_website/blob/5e3ebd65161393001c204a0edf2c1d26f7c4e38e/img/title-slide-img.png)
+background-image: url(img/title-slide-img.png)
 background-size: cover
 
 .salt[FIN7030]
@@ -138,7 +138,7 @@ class: middle
 - In workshop 4 we used `PortfolioAnalytics` and chart the performance of our competing strategies.
 ]
 .pull-right-2[
-<img src='https://github.com/barryquinn1/quinnference_website/blob/5e3ebd65161393001c204a0edf2c1d26f7c4e38e/img/chart-1.png' class="center">
+<img src='img/chart-1.png' class="center">
 - You can see the drawdown statistics in the bottom graph
 ]
 
@@ -502,7 +502,7 @@ sr1 %>% ggplot(aes(x=nTrails,y=`Max{SR}`)) +
   labs(y="E{maxSR},MaxSR",x="Number of Trails",title="max(SR) for uninformed strategies for std(SR)=1")
 ggsave(filename="img/maxSR.png",dpi=400, width =12,height=6)
 ```
-<img src="https://github.com/barryquinn1/quinnference_website/blob/5e3ebd65161393001c204a0edf2c1d26f7c4e38e/img/maxSR.png">
+<img src="img/maxSR.png">
 
 ---
 class: middle

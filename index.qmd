@@ -12,6 +12,7 @@ format:
     theme: default
     transition: slide
     slide-number: true
+    scrollable: true
     width: 1600
     height: 900
     
@@ -73,7 +74,7 @@ library(tidyverse)
 :::
 
 
-##  Performance statistics
+##  Performance statistics {.small}
 
 
 | Performance Statistic | Description |
@@ -85,7 +86,7 @@ library(tidyverse)
 | Average return from hits | The average return from bets that generated a profit. |
 | Average return from misses | The average return from bets that generated a loss. |
 
-##  Risk statistics
+##  Risk statistics {.small}
 
 :::: {.columns}
 
@@ -102,7 +103,7 @@ library(tidyverse)
 
 ::::
 
-## Implementation shortfall statistics
+## Implementation shortfall statistics {.small}
 
 
 #### Broker fees per turnover
@@ -122,7 +123,7 @@ library(tidyverse)
 - Return on execution costs: This is the ratio between dollar performance (including brokerage fees and slippage costs) and total execution costs.
 
 
-##   Efficiency statistics
+##   Efficiency statistics {.small}
 
 ::: {.blockquote .center}
 Efficiency statistics provide a relative analysis of the performance of a backtest.
@@ -145,7 +146,7 @@ Efficiency statistics provide a relative analysis of the performance of a backte
 
 - Deflated Sharpe ratio: DSR corrects SR for inflationary effects caused by non-Normal returns, track record length, and selection bias under multiple testing.
 
-## Precision and Recall in Statistics
+## Precision and Recall in Statistics {.small}
 
 - To understand how false discoveries affect performance in algorithmic trading and investment, we must first introduce two concepts. 
 - In machine learning statistics, precision and recall are measures of task specific accuracy, especially in classification problems.
@@ -159,7 +160,7 @@ precision is the estimated probability that a randomly selected investment strat
 recall (or true positive rate) is the estimated probability that a strategy randomly selected from the pool of true strategy has a positive backtest
 :::
 
-##  The Neyman-Pearson Framework
+##  The Neyman-Pearson Framework {.small}
 
 Under the standard Neyman-Pearson [1933] hypothesis testing framework:
 
@@ -181,17 +182,17 @@ Under the standard Neyman-Pearson [1933] hypothesis testing framework:
 
 - Note again that p-value $\alpha$ does not give the probability that the null hypothesis is true.
 
-##  A mathematical argument (Lopez de Prado 2020)
+##  A mathematical argument (Lopez de Prado 2020) {.small}
 
 - Let's say you have $s$ investment strategies to analyze as a quant researcher. 
 - Inevitably, some of these strategies are false discoveries, in the sense that their expected return is not positive. 
 - Mathematically, we can denote:
 
-$$s=s_T+s_F \\ \text{where } \\ s_T=\text{number of true strategies} \\ s_F=\text{number of false strategies}$$
+$$s=s_T+s_F \\ \text{vvwhere } \\ s_T=\text{number of true strategies} \\ s_F=\text{number of false strategies}$$
 
 - Let $\theta$ be the odds ratio of true strategies against false strategies, $\theta=s_T/s_F$. 
 
-## A mathematical argument (Lopez de Prado 2020)
+## A mathematical argument (Lopez de Prado 2020) {.small}
 
 - In finance, where the signal-to-noise ratio is low, false strategies abound, hence $θ$ is expected to be low. The number of true investment strategies is:
 
@@ -203,7 +204,7 @@ $$S_F=S-S_T=s \left( 1-\frac{\theta}{(1+\theta)}\right)=s\frac{1}{(1+\theta)} $$
 
 - Given a false positive rate $\alpha$ (type I error), we will obtain a number of false positives, $FP=\alpha\times S_F$, and a number of true negatives, $TN=(1-\alpha)s_F$. 
 
-##  A mathematical argument (Lopez de Prado 2020)
+##  A mathematical argument (Lopez de Prado 2020) {.small}
 
 - Denote $\beta$ the false negative rate (type II error) associated with that $\alpha$. 
 - We will obtain a number of false negatives, $FN=\beta \times s_F$, and a number of true positives, $TP=(1-\beta)s_T$.
@@ -217,7 +218,7 @@ $$\text{precision}=\frac{TP}{(TP+FP)} = \frac{(1-\beta)s_T}{(1+\beta)s_T+\alpha 
 $$\text{recall}=\frac{TP}{(TP+FN)}=\frac{(1-\beta)s_T}{(1-\beta)s_T+\beta s_T}=1-\beta$$
 :::
 
-## A mathematical argument (Lopez de Prado 2020)
+## A mathematical argument (Lopez de Prado 2020) {.small}
 
 - What the mathematical logic tells us is before running backtests on a strategy, researchers should gather evidence that a strategy may indeed exist. 
 - The reason is, the precision of the test is a function of the odds ratio $\theta$. 
@@ -234,7 +235,7 @@ In particular, a strategy is more likely false than true if $(1-\beta)\theta < \
 
 $$FDR=\frac{FP}{(FP+TP)}=\frac{\alpha}{(1-\beta)\theta+\alpha}=1-precision$$
 
-##  A FDR function
+##  A FDR function {.small}
 
 ::: {.columns}
 
@@ -265,7 +266,7 @@ fdr_anal(0.01, beta = 0.2)
 
 :::
 
-## Familywise Error Rate (FWER)
+## Familywise Error Rate (FWER) {.small}
 
 - When Neyman and Pearson [1933] proposed this framework, they did not consider the possibility of conducting multiple tests and select the best outcome.
 - When a test is repeated multiple times, the combined $\alpha$ increases.
@@ -274,7 +275,6 @@ fdr_anal(0.01, beta = 0.2)
 - If the two trials are independent, the probability of not making a Type I error on the first and second tests is $(1-\alpha)^2$
 - The probability of making *at least one* Type I error is the complementary, $1-(1-\alpha)^2$
 - After a *family* of K independent tests, we reject H<sub>0</sub> with confidence $(1-\alpha)^K$
-- FWER is the probability that at least one of the positives is false, $\alpha_K=1-(1-\alpha
 
 - FWER the probability that at least one of the positives is false, $\alpha_K=1-(1-\alpha)^K$
 
@@ -292,8 +292,11 @@ fdr_anal(0.01, beta = 0.2)
 ## FWER vs FDR {.small}
   
 - However, in the context of finance, the FDR is preferrred as an investor does not typically allocate funds to all strategies with predicted positives within a family of trials, where a proportion of them are likely to be false.
+
 - Instead, investors are only introduced to the single best strategy out of a family of thousands or even millions of alternatives
+
 - Investors have no ability to invest in the discarded predicted positives.
+
 - Following the car analogue, in finance there is actually a single car unit produced per model, which everyone will use. If the only produced unit is defective, everyone will crash.]
 
 
@@ -308,7 +311,7 @@ fdr_anal(0.01, beta = 0.2)
 - Lopez de Prado (2020) develops a framework to assess the probability that a strategy is false, using the Sharpe ratio estimate and metadata from the discovery process as inputs
 
 
-## The golden age of the Sharpe Ratio (1966-2012)
+## The golden age of the Sharpe Ratio (1966-2012) {.small}
 
 - In 1966, William Sharpe proposed a ratio metric that would come to dominate investment strategy appraisal 
 - Consider an investment strategy with excess returns (or risk premia) $r_t, t=1,...,T$ which follows an IID Normal distribution
@@ -319,7 +322,8 @@ $$SR=\frac{\mu}{\sigma}$$
 
 $$\hat{SR}=\frac{E(r_t)}{\sqrt{V_{r_t}}}$$
 
-## 2002 Andrew Lo and Elmar Mertens
+## 2002 Andrew Lo and Elmar Mertens {.small}
+
 - [Andrew Lo](https://mitsloan.mit.edu/faculty/directory/andrew-w-lo) show that under the assumption that $r_t \overset{IID}{\sim} N(\mu,\sigma)$ the asymptotic  distribution of $\hat{SR}$ is
 
 $$(\hat{SR}-SR) \overset{a}{\to} N \left[0,\frac{1+0.5SR^2}{T}\right]$$
@@ -330,7 +334,7 @@ $$(\hat{SR}-SR) \overset{a}{\to} N \left[0,\frac{1+0.5SR^2}{T}\right]$$
 - [Elmar Mertons](http://www.elmarmertens.com/) then derived an asymptotic distribution for $\hat{SR}$ that include a variance terms which incorporated skewness and kurtosis.
 
 
-## 2012 David Bailey and Marco lopez de Prado
+## 2012 David Bailey and Marco lopez de Prado {.small}
 
 - In the Journal of Risk, [David Bailey](https://www.davidhbailey.com/) and [Marco Lopez de Prado](https://www.quantresearch.org/) utilises previous results to derive the [Probabilistic Sharpe Ratio](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1821643)
 
@@ -342,10 +346,12 @@ $$\hat{PSR}(SR*)=Z\left(\frac{(\hat{SR}-SR*)\sqrt{T-1}}{\sqrt{1-\hat{\gamma_3}\h
 - where Z[.] is the cumulative density function of the standard Normal distribution, T is number of observed returns, and $\hat{SR}$ is the non-annualised estimate of SR, computed on the same frequency as the T observations. 
 
 
-## Inference
+## Inference on the Probabilistic Sharpe Ratio
+
 - For a given SR*, the probabilistic sharpe ratio increases with greater mean returns, lower variance of returns, longer track record (T), positively skewed returns, and thinner tails
 
-## The False Strategy Theorem 
+## The False Strategy Theorem
+
 - Bailey et al. (2014) formalised a theorem ,*False Strategy Theorem* , that expressed the SBuMT as a function on the number of trails and the variance of the Sharpe ratios.
 
 ::: {.blockquote}
@@ -362,7 +368,8 @@ $$\hat{PSR}(SR*)=Z\left(\frac{(\hat{SR}-SR*)\sqrt{T-1}}{\sqrt{1-\hat{\gamma_3}\h
 
 $$E(\underset{k}max(\widehat{SR_k}))V(\widehat{SR_k}^{-0.5} \approx (1-\gamma)Z^{-1} \left[1-\frac{1}{K}\right]+\gamma Z^{-1}\left[1-\frac{1}{Ke}\right] $$
 - where $Z^{-1}$ is the inverse of the standard Gaussian CDF, e is Euler's number, and $\gamma $is the Euler-Mascheroni constant.
-- .heatinline[Corollary:] Unless $\underset{k}max(\widehat{SR_k}) >> E(\underset{k}max(\widehat{SR_k}))$  the discovered strategy is likely to be a false positive.
+
+- **Corollary:** Unless $\underset{k}max(\widehat{SR_k}) >> E(\underset{k}max(\widehat{SR_k}))$  the discovered strategy is likely to be a false positive.
 
 - But $E(\underset{k}max(\widehat{SR_k}))$ is usually unknown, ergo SR is dead.
 
@@ -370,17 +377,9 @@ $$E(\underset{k}max(\widehat{SR_k}))V(\widehat{SR_k}^{-0.5} \approx (1-\gamma)Z^
 ## The *False Strategy* theorem
 - .Lopez de Prado (2020) `r fa('python')` code
 - The theorem can be used to express the magnitude of the SBuMT as the difference between the expected maximum Sharpe ratio and the expected Sharpe ratio of a *false* strategy from a random trail
-```
-import numpy as np,pandas as pd
-from scipy.stats import norm,percentileofscore
-def getExpectedMaxSR(nTrials,meanSR,stdSR):
-  emc=0.577215664901532860606512090082402431042159336
-  sr0=(1-emc)*norm.ppf(1-1./nTrials)+/
-  emc*norm.ppf(1-(nTrials*np.e)**-1) 
-  sr0=meanSR+stdSR*sr0
-  return sr0
-```
-## Translation into `R`
+
+
+## The *False Strategy* theorem  `R`
 ```{r E_MAX_SR}
 getExpectedMaxSR<-function(nTrails,meanSR,stdSR){
   # Expected Max SR controlling for SBuMT
@@ -458,89 +457,47 @@ $V(\hat{SR})$ which is where FML can help.
 
 - Specifically, we are employ optimal number of clustering to estimate K the effective number of trails and then calculate the variances.  
 
-## Implications  for Academics {.small}
-::: columns
-::: column
-- Most studies in empirical finance are false Harvey et al. (2016)
-- Selection bias may invalidate the entire body of work performed for the past 100 years. 
-- Finance cannot survive as a discipline unless we solve this problem.
-- Unless we learn to prevent them, investors and regulators have no reason to trust the value added by researchers and asset managers.
 
-:::
-::: column
+## Implications for Academics
 
-- Applying the False Strategy theorem to the prevention of false positives in finance. 
-- This requires the estimation of two meta-research variables that allow us to discount for the likelihood of “lucky findings.”
-- Given that this method appears to be accurate and relatively easy to implement, academic journals should cease to accept papers that do not control for selection bias under multiple testing.
-- In particular, papers must report the probability that the claimed financial discovery is a false positive.
-:::
+::: {.columns}
+::: {.column width="50%"}
+- Most studies in empirical finance are false (Harvey et al., 2016)
+- Selection bias may invalidate the entire body of work performed for the past 100 years
+- Finance cannot survive as a discipline unless we solve this problem
+- Investors and regulators have no reason to trust the value added by researchers and asset managers unless we learn to prevent false discoveries
 :::
 
-## Implications for Regulators {.small}
+::: {.column width="50%"}
+- Applying the False Strategy theorem to prevent false positives in finance
+- Requires estimating two meta-research variables to discount for "lucky findings"
+- Academic journals should cease accepting papers that do not control for selection bias under multiple testing
+- Papers must report the probability that the claimed financial discovery is a false positive
+:::
+:::
 
-- Before the Food and Drug Administration (FDA) was created, adulteration and mislabeling of food and drugs caused frequent episodes of mass poisoning, birth defects and death. Such calamities only stopped through the enforcement of minimum research quality standards that prevented false positives.
-- Every year, financial firms engaging in backtest overfitting defraud investors for tens of billions of dollars. It is, perhaps, the greatest fraud in financial history. It will only worsen as more powerful computers allow for an ever-larger number of trials. The financial firms of today are the pharmaceutical firms of 100 years ago.
-- We hope that the machine learning tools presented in this paper will empower the Securities and Exchange Commission (SEC) and other regulatory agencies worldwide to take a more active role in stopping this rampant financial scam.
-– The SEC could demand that, going forward, quantitative firms that promote new investments must certify the probability that the proposed advice is simply bogus (false positive probability)
-– Quantitative firms should be required to store all trials involved in a discovery, so that a post-mortem analysis can be conducted after an investment fails to perform as advertised
+## Implications for Regulators
 
+- Before the FDA, adulteration and mislabeling of food and drugs caused frequent episodes of mass poisoning, birth defects, and death
+- Financial firms engaging in backtest overfitting defraud investors for tens of billions of dollars annually
+- The SEC could demand quantitative firms certify the probability that promoted investments are bogus
+- Quantitative firms should be required to store all trials involved in a discovery for post-mortem analysis
 
-## Implications for investors {.small}
-- Many financial firms pray on the public’s trust in science.
-- They promote pseudo-scientific products arguments as scientific.
-- Investors must understand that investment products based on award-winning journal articles are not necessarily scientific.
-– The authors never reported the number of trials involved in a discovery, and therefore we must assume the discovery is false
-– Firms have all the incentive to promote those journal articles, and make a fortune by charging fees (agency problem)
-- One cynical argument is this: If the original author has not become rich with the discovery, what are my chances I will? The firm will make money regardless.
-- For every financial product or investment advice, investors must demand that firms report the results of all trials, not only the best-looking ones.
-- Investors should consult databases of investment forecasts, and assess the credibility of gurus and financial firms, based on all outcomes from past predictions investment funds (control for survivorship bias).
+## Implications for Investors
 
----
-class: middle
-# References
+- Many financial firms promote pseudo-scientific products as scientific
+- Investment products based on award-winning journal articles are not necessarily scientific
+- If the original author has not become rich with the discovery, investors' chances are slim
+- Investors should demand firms report the results of all trials, not only the best-looking ones
+- Investors should consult databases of investment forecasts and assess the credibility of gurus and financial firms based on all outcomes from past predictions
 
-.small[
-[Gu, Shihao, Bryan Kelly, and Dacheng Xiu. 2020. “Empirical Asset Pricing via Machine Learning.” The Review of Financial Studies, Working Paper Series, , February.](https://doi.org/10.1093/rfs/hhaa009)
+## References
 
-Harvey, Campbell R., Presidential Address: The Scientific Outlook in Financial Economics (July 17, 2017). Duke I&E Research Paper No. 2017-05, Available at SSRN: https://ssrn.com/abstract=2893930 or http://dx.doi.org/10.2139/ssrn.2893930
-
-American Statistical Association (2016): “Ethical guidelines for statistical practice.” Committee on Professional Ethics of the American Statistical Association (April). Available at http://www.amstat.org/asa/files/pdfs/EthicalGuidelines.pdf
-
-López de Prado, M. and M. Lewis (2018): “Detection of False Investment Strategies Using Unsupervised Learning Methods.” Working Paper. Available at https://ssrn.com/abstract=3167017⁄
-
-Bailey, D., J. Borwein, M. López de Prado, and J. Zhu (2014a): “Pseudo- mathematics and financial charlatanism: The effects of backtest overfitting on out-of-sample performance.” Notices of the American Mathematical Society, Vol. 61, No. 5, pp. 458–471. Available at http://ssrn.com/abstract=2308659
-
-Bailey, D., J. Borwein, M. López de Prado, and J. Zhu (2017): “The Probability of Backtest Overfitting.” Journal of Computational Finance, Vol. 20, No. 4, pp. 39-70. Available at http://ssrn.com/abstract=2326253
-
-Bailey, D. and M. López de Prado (2012): “The Sharpe ratio efficient frontier.” Journal of Risk, Vol. 15, No. 2, pp. 3–44.
-
-Bailey, D. and M. López de Prado (2014): “The deflated Sharpe ratio: Correcting for selection bias, backtest overfitting and non-normality.” Journal of Portfolio Management, Vol. 40, No. 5, pp. 94-107.
-
-Christie, S. (2005): “Is the Sharpe Ratio Useful in Asset Allocation?” MAFC Research Paper No. 31, Applied Finance Centre, Macquarie University.Electronic copy available at: https://ssrn.com/abstract=3261943
-
-Harvey, C., Y. Liu and C. Zhu (2016): “...and the Cross-Section of Expected Returns.” Review of Financial Studies, 29(1), pp. 5-68. Available at https://ssrn.com/abstract=2249314
-
-Lo, A. (2002): “The Statistics of Sharpe Ratios.” Financial Analysts Journal (July), pp. 36-52.
-López de Prado, M. (2016a): “Building Diversified Portfolios that Outperform Out- of-Sample.” Journal of Portfolio Management, Vol. 42, No. 4, pp. 59-69.
-]
-
-
-## Further Reading
-
-López de Prado, M. (2016b): “Mathematics and Economics: A reality check.” Journal of Portfolio Management, Vol. 43, No. 1, pp. 5-8.
-
-López de Prado, M. (2017): “Finance as an Industrial Science.” Journal of Portfolio Management, Vol. 43, No. 4, pp. 5-9.
-
-López de Prado, M. (2018): Advances in Financial Machine Learning. 1st edition, Wiley. https://www.amazon.com/dp/1119482089
-
-Mertens, E. (2002): “Variance of the IID estimator in Lo (2002).” Working paper, University of Basel.
-
-Opdyke, J. (2007): “Comparing Sharpe ratios: So where are the p-values?” Journal of Asset Management, Vol. 8, No. 5, pp. 308–336.Electronic copy available at: https://ssrn.com/abstract=3261943
-
-• Rousseeuw, P. (1987): “Silhouettes: a Graphical Aid to the Interpretation and Validation of Cluster Analysis.” Computational and Applied Mathematics, Vol. 20, pp. 53–65.
-
-• Sharpe, W. (1966): “Mutual Fund Performance”, Journal of Business, Vol. 39, No. 1, pp. 119–138.
-
-• Sharpe, W. (1975): “Adjusting for Risk in Portfolio Performance Measurement", Journal of Portfolio Management, Vol. 1, No. 2, Winter, pp. 29-34.
-
-• Sharpe, W. (1994): “The Sharpe ratio”, Journal of Portfolio Management, Vol. 21, No. 1, Fall, pp. 49-58.
+- Gu, Shihao, Bryan Kelly, and Dacheng Xiu. 2020. "Empirical Asset Pricing via Machine Learning." The Review of Financial Studies.
+- Harvey, Campbell R., Presidential Address: The Scientific Outlook in Financial Economics. 2017.
+- American Statistical Association. 2016. "Ethical guidelines for statistical practice."
+- López de Prado, M. and M. Lewis. 2018. "Detection of False Investment Strategies Using Unsupervised Learning Methods."
+- Bailey, D., J. Borwein, M. López de Prado, and J. Zhu. 2014. "Pseudo-mathematics and financial charlatanism: The effects of backtest overfitting on out-of-sample performance."
+- Bailey, D., J. Borwein, M. López de Prado, and J. Zhu. 2017. "The Probability of Backtest Overfitting."
+- Bailey, D. and M. López de Prado. 2012. "The Sharpe ratio efficient frontier."
+- Bailey, D. and M. López de Prado. 2014. "The deflated Sharpe ratio: Correcting for selection bias, backtest overfitting and non-normality."

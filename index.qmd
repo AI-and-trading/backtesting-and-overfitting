@@ -75,7 +75,6 @@ library(tidyverse)
 
 ##  Performance statistics
 
-Sure! Here's the updated table without the `[]`, `{}`, and their content:
 
 | Performance Statistic | Description |
 |----------------------|-------------|

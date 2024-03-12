@@ -2,7 +2,6 @@
 title: "Algorithmic trading and investment"
 subtitle: "FIN7030"
 author: "Barry Quinn"
-date: "`r Sys.Date()`"
 output:
   xaringan::moon_reader:
     includes:

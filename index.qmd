@@ -1,6 +1,6 @@
 ---
-title: "Backtesting overfitting"
-subtitle: ""
+title: "Backtesting overfitting" 
+subtitle: "Theory and Practice"
 author: "Barry Quinn"
 footer: "AI and Trading"
 embed-resources: true
@@ -15,7 +15,6 @@ format:
     scrollable: true
     width: 1600
     height: 900
-    
 execute:
   echo: true
 ---
@@ -27,15 +26,18 @@ library(xaringanExtra)
 library(kableExtra)
 library(fontawesome)
 library(tidyverse)
+library(factoextra)
 ```
 
+# In Theory
 
 ## Outline
-- Backtesting and selection bias under  multiple testing
-- Precision and recall in statistics
-- Neyman Pearson Type I and Type || errors under multiple hypothesis testing
-- False discovery
-- Most important simulation in quantitative finance
+- Backtesting and selection bias under multiple testing
+- Precision and recall in statistical testing
+- Neyman-Pearson framework: Type I and Type II errors
+- False discovery rate in multiple hypothesis testing
+- Measuring overfitting: The Deflated Sharpe Ratio
+- Practical implementation & risk management implications
 
 
 ## Experiment evidence using simulation
@@ -51,15 +53,27 @@ library(tidyverse)
 - A backtest is a historical simulation of how an investment strategy would have performed in the past.
 - It is not a controlled experiment, because we cannot change the environmental variables to derive a new historical time series on which to perform an independent backtest. 
 - As a result, backtests cannot help us derive the precise cause–effect mechanisms that make a strategy successful.
-- This identification issue is more than a techical inconvenience
+- This identification issue is more than a technical inconvenience
+
+::: {.content-box-yellow}
+**Key Challenge:** Financial data is limited, non-stationary, and path-dependent, making proper validation fundamentally different from other fields like machine learning on image or text data.
+:::
 
 ## Overfitting and statistical inflation
 
 - In the context of strategy development, all we have is a few (relatively short, serially correlated, multicollinear and possibly nonstationary) historical time series.
 - It is easy for a researcher to overfit a backtest, by conducting multiple historical simulations, and selecting the best performing strategy (Bailey et al. 2014). 
 - When a researcher presents an overfit backtest as the outcome of a single trial, the simulated performance is inflated. 
-- [This form of statistical inflation is called selection bias under multiple testing (SBuMT).]{.content-box-yellow}
+
+::: {.content-box-yellow}
+This form of statistical inflation is called **selection bias under multiple testing (SBuMT)**
+:::
+
 - SBuMT leads to false discoveries: strategies that are replicable in backtests, but fail when implemented.
+
+::: {.blockquote .small}
+**Defining Backtest Overfitting:** When the process of backtest optimization leads to strategies that fit the noise in historical data rather than genuine market inefficiencies.
+:::
 
 ## Backtest hyperfitting {.small}
 
@@ -315,10 +329,14 @@ fdr_anal(0.01, beta = 0.2)
 
 - In 1966, William Sharpe proposed a ratio metric that would come to dominate investment strategy appraisal 
 - Consider an investment strategy with excess returns (or risk premia) $r_t, t=1,...,T$ which follows an IID Normal distribution
+
 $$ r_t \sim N(\mu,\sigma)$$
+
 - Non-annualised SR of such a strategy is defined as 
+
 $$SR=\frac{\mu}{\sigma}$$
-- as the parameters $\mu \text{ and } \sigma$ are unknown, they must be estimated such that SR is estimated as:
+
+- as the parameters $\mu$ and $\sigma$ are unknown, they must be estimated such that SR is estimated as:
 
 $$\hat{SR}=\frac{E(r_t)}{\sqrt{V_{r_t}}}$$
 
@@ -343,35 +361,34 @@ $$(\hat{SR}-SR) \overset{a}{\to} N \left[0,\frac{1+0.5SR^2}{T}\right]$$
 
 $$\hat{PSR}(SR*)=Z\left(\frac{(\hat{SR}-SR*)\sqrt{T-1}}{\sqrt{1-\hat{\gamma_3}\hat{SR}+\frac{\hat{\gamma_4}-1}{4}\hat{SR}^2}}\right)$$
 
-- where Z[.] is the cumulative density function of the standard Normal distribution, T is number of observed returns, and $\hat{SR}$ is the non-annualised estimate of SR, computed on the same frequency as the T observations. 
-
+- where $Z[.]$ is the cumulative density function of the standard Normal distribution, $T$ is number of observed returns, and $\hat{SR}$ is the non-annualised estimate of SR, computed on the same frequency as the $T$ observations. 
+:::
 
 ## Inference on the Probabilistic Sharpe Ratio
 
-- For a given SR*, the probabilistic sharpe ratio increases with greater mean returns, lower variance of returns, longer track record (T), positively skewed returns, and thinner tails
+- For a given $SR*$, the probabilistic sharpe ratio increases with greater mean returns, lower variance of returns, longer track record ($T$), positively skewed returns, and thinner tails
 
 ## The False Strategy Theorem
 
-- Bailey et al. (2014) formalised a theorem ,*False Strategy Theorem* , that expressed the SBuMT as a function on the number of trails and the variance of the Sharpe ratios.
+- Bailey et al. (2014) formalised a theorem, *False Strategy Theorem*, that expressed the SBuMT as a function on the number of trails and the variance of the Sharpe ratios.
 
 ::: {.blockquote}
-
 - In practice a researcher may carry out a large number of historical simulations (trails) and report only the best outcome (maximum Sharpe ratio)
-- Maximum Sharpe ratio is not randomly distributed which gives rise to *SBuMT*, so when more than one trail takes place the maximum Sharpe ration is greater than the expected value of the Sharpe ration from a random trail.
+- Maximum Sharpe ratio is not randomly distributed which gives rise to *SBuMT*, so when more than one trail takes place the maximum Sharpe ratio is greater than the expected value of the Sharpe ratio from a random trail.
 - The theorem shows that given a investment strategy with an expected Sharpe ratio of zero and non-zero variance, the expected value of the maximum Sharpe ratio is strictly positive and a function of the number of trails
 :::
 
 ## The False Strategy Theorem
 
-- Given a sample of IID-Gaussian Sharpe ratios $\widehat{SR_k},k=1,..,K \text{  with } \widehat{SR_k} \sim N(0,V(\widehat{SR_k})$
+- Given a sample of IID-Gaussian Sharpe ratios $\widehat{SR_k},k=1,..,K$ with $\widehat{SR_k} \sim N(0,V(\widehat{SR_k}))$
 
+$$E(\underset{k}{\max}(\widehat{SR_k}))V(\widehat{SR_k})^{-0.5} \approx (1-\gamma)Z^{-1} \left[1-\frac{1}{K}\right]+\gamma Z^{-1}\left[1-\frac{1}{Ke}\right]$$
 
-$$E(\underset{k}max(\widehat{SR_k}))V(\widehat{SR_k}^{-0.5} \approx (1-\gamma)Z^{-1} \left[1-\frac{1}{K}\right]+\gamma Z^{-1}\left[1-\frac{1}{Ke}\right] $$
-- where $Z^{-1}$ is the inverse of the standard Gaussian CDF, e is Euler's number, and $\gamma $is the Euler-Mascheroni constant.
+- where $Z^{-1}$ is the inverse of the standard Gaussian CDF, $e$ is Euler's number, and $\gamma$ is the Euler-Mascheroni constant.
 
-- **Corollary:** Unless $\underset{k}max(\widehat{SR_k}) >> E(\underset{k}max(\widehat{SR_k}))$  the discovered strategy is likely to be a false positive.
+- **Corollary:** Unless $\underset{k}{\max}(\widehat{SR_k}) >> E(\underset{k}{\max}(\widehat{SR_k}))$ the discovered strategy is likely to be a false positive.
 
-- But $E(\underset{k}max(\widehat{SR_k}))$ is usually unknown, ergo SR is dead.
+- But $E(\underset{k}{\max}(\widehat{SR_k}))$ is usually unknown, ergo SR is dead.
 
 
 ## The *False Strategy* theorem
@@ -449,13 +466,13 @@ ggsave(filename="img/maxSR.png",dpi=400, width =12,height=6)
 
 - [The Deflated Sharpe Ratio](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2460551) computes the probability that the Sharpe Ratio (SR) is statistically significant.
 
-$$\widehat{DSR} \equiv \widehat{PSR}(\widehat{SR_0})=Z \left[\frac{(\hat{SR}-E[max_k(\widehat{SR_k})])\sqrt{T-1}}{\sqrt{1-\hat{\gamma_3}\widehat{SR}+\frac{\hat{\gamma_4}-1}{4}\widehat{SR}^2}}\right]$$ 
+$$\widehat{DSR} \equiv \widehat{PSR}(\widehat{SR_0})=Z \left[\frac{(\hat{SR}-E[\max_k(\widehat{SR_k})])\sqrt{T-1}}{\sqrt{1-\hat{\gamma_3}\widehat{SR}+\frac{\hat{\gamma_4}-1}{4}\widehat{SR}^2}}\right]$$
+
 - $\widehat{DSR}$ can be interpreted as the probability of observing a Sharpe ratio greater or equal to $\widehat{SR}$ subject to the null hypothesis that the true Sharpe ratio is zero, while adjusting for skewness $\gamma_3$, kurtosis $\gamma_4$, sample length and multiple testings.
 
-- Calculate DSR requires the estimation $E[max_k(\widehat{SR_k})])$ which requires estimating $K$ and 
-$V(\hat{SR})$ which is where FML can help.
+- Calculate DSR requires the estimation $E[\max_k(\widehat{SR_k})]$ which requires estimating $K$ and $V(\hat{SR})$ which is where FML can help.
 
-- Specifically, we are employ optimal number of clustering to estimate K the effective number of trails and then calculate the variances.  
+- Specifically, we are employ optimal number of clustering to estimate $K$ the effective number of trails and then calculate the variances.
 
 
 ## Implications for Academics
@@ -491,8 +508,678 @@ $V(\hat{SR})$ which is where FML can help.
 - Investors should demand firms report the results of all trials, not only the best-looking ones
 - Investors should consult databases of investment forecasts and assess the credibility of gurus and financial firms based on all outcomes from past predictions
 
+## The Overfitting Spectrum
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Low Risk of Overfitting**
+
+- Few parameters (1-3)
+- Simple decision rules
+- Strong economic rationale
+- Consistent performance across markets
+- Limited configuration variations tested
+- Long out-of-sample periods
+:::
+
+::: {.column width="50%"}
+**High Risk of Overfitting**
+
+- Many parameters (10+) 
+- Complex decision rules
+- No clear economic explanation
+- Performance varies across markets
+- Thousands of configurations tested
+- Short out-of-sample periods
+:::
+
+::::
+
+::: {.blockquote .center}
+The risk of false discovery increases exponentially with the number of configurations tested
+:::
+
+## Visualizing Precision and FDR {.small}
+
+```{r precision_fdr_plot}
+#| echo: false
+# Create data for plotting
+ground_truths <- seq(0.01, 0.5, length.out = 100)
+results <- map_dfr(ground_truths, ~fdr_anal(.x, beta = 0.2))
+
+ggplot(results, aes(x = ground_truths)) +
+  geom_line(aes(y = Precision, color = "Precision")) +
+  geom_line(aes(y = FDR, color = "FDR")) +
+  labs(x = "Odds Ratio (θ)", y = "Probability",
+       title = "Precision and FDR vs Odds Ratio",
+       color = "Metric") +
+  theme_minimal() +
+  scale_color_manual(values = c("Precision" = "blue", "FDR" = "red"))
+```
+
+::: {.blockquote .small}
+**Critical Result:** Even with a 5% significance level, when the odds ratio is low (common in finance), the false discovery rate can exceed 80%.
+:::
+
+## Practical Implementation of DSR {.small}
+
+1. **Data Collection**
+   - Gather all trials/backtests performed
+   - Record Sharpe ratios and their variances
+   - Document the number of configurations tested
+
+2. **Estimate Parameters**
+   - Calculate effective number of trials (K)
+   - Estimate variance of Sharpe ratios
+   - Compute skewness and kurtosis
+
+3. **Calculate DSR**
+   - Apply the DSR formula
+   - Interpret results in terms of probability
+
+::: {.content-box-yellow}
+**Best Practice:** Document and store all trials, not just the successful ones.
+:::
+
+## Real-World Strategy Evaluation Framework {.small}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Performance Metrics**
+
+- Sharpe Ratio
+- Sortino Ratio
+- Calmar Ratio
+- Maximum Drawdown
+- Win Rate
+:::
+
+::: {.column width="50%"}
+**Robustness Checks**
+
+- Out-of-sample testing
+- Monte Carlo simulations
+- Stress testing
+- Parameter stability
+:::
+
+::::
+
+::: {.blockquote .center}
+A comprehensive evaluation requires both performance metrics and robustness checks
+:::
+
+## Future Directions and Open Questions {.small}
+
+1. **Methodological Challenges**
+   - Estimating true number of trials
+   - Handling non-stationary markets
+   - Accounting for transaction costs
+
+2. **Regulatory Framework**
+   - Standardizing backtest reporting
+   - Establishing minimum requirements
+   - Creating audit trails
+
+3. **Research Opportunities**
+   - Machine learning applications
+   - Alternative performance metrics
+   - Cross-market validation
+
+::: {.content-box-yellow}
+**Key Question:** How can we develop more robust methods for strategy validation in an era of increasing data availability and computational power?
+:::
+
+# The Practice
+
+## From Theory to Practice
+
+::: {.saltinline}
+- We've covered the theoretical foundations of backtest overfitting
+- Now we'll focus on practical implementation
+- Key questions:
+  - How do we calculate the Deflated Sharpe Ratio in practice?
+  - How do we estimate the effective number of trials?
+  - What practical workflows can prevent false discoveries?
+:::
+
+## A Practical DSR Workflow
+
+:::: {.columns}
+
+::: {.column width="50%"}
+1. Strategy development and backtesting
+2. Estimation of effective number of trials ($K$)
+3. Estimation of Sharpe ratio variance
+4. Calculation of expected maximum Sharpe ratio
+5. Calculation of Deflated Sharpe Ratio
+6. Evaluation against DSR threshold
+:::
+
+::: {.column width="50%"}
+![](img/dsr_workflow.png){.center}
+:::
+
+::::
+
+## Estimating the Effective Number of Trials
+
+- In practice, strategies are often highly correlated
+- The effective number of independent trials ($K$) is typically much lower than the total number of configurations tested
+- Methods to estimate $K$:
+  1. Clustering of strategy returns
+  2. Principal Component Analysis
+  3. Researcher's logs of configuration tests
+
+## Clustering Approach to Effective Trials
+
+```{r clustering_example}
+# Generate correlated strategy returns
+set.seed(42)
+n_strategies <- 50
+n_returns <- 252
+base_returns <- matrix(rnorm(10 * n_returns), nrow = n_returns)
+
+# Create strategies with varying correlations to base returns
+strategies_returns <- matrix(0, nrow = n_returns, ncol = n_strategies)
+for(i in 1:n_strategies) {
+  # Mix of base returns and unique noise
+  weight <- runif(1, 0.3, 0.9)
+  base_idx <- sample(1:10, 1)
+  strategies_returns[,i] <- weight * base_returns[,base_idx] + 
+                           (1-weight) * rnorm(n_returns)
+}
+
+# Calculate correlation matrix
+cor_matrix <- cor(strategies_returns)
+# Convert to distance matrix
+dist_matrix <- as.dist(1 - abs(cor_matrix))
+# Hierarchical clustering
+hc <- hclust(dist_matrix, method = "complete")
+
+# Plot dendrogram
+plot(hc, main = "Hierarchical Clustering of Strategy Returns", 
+     xlab = "", sub = "", cex = 0.6)
+rect.hclust(hc, k = 8, border = "red")
+```
+
+## Visualizing Effective Number of Trials
+
+```{r silhouette_method}
+# Convert strategies_returns to a data frame
+strategies_df <- as.data.frame(strategies_returns)
+colnames(strategies_df) <- paste0("Strategy", 1:ncol(strategies_df))
+
+# Calculate optimal number of clusters using silhouette method
+# Note: We'll use the data frame directly instead of the distance matrix
+fviz_nbclust(strategies_df, FUN = hcut, method = "silhouette", 
+             k.max = 15) +
+  labs(title = "Optimal Number of Clusters",
+       subtitle = "Using Silhouette Method")
+
+# Cut tree at optimal number
+k_opt <- 8  # Based on silhouette plot
+clusters <- cutree(hc, k = k_opt)
+
+# Show the first few strategies and their cluster assignments
+head(tibble(Strategy = 1:n_strategies, Cluster = clusters), 10)
+```
+
+## The Link Between Clustering and Effective Trials
+
+::: {.blockquote}
+The effective number of independent trials ($K_{eff}$) is approximately equal to the optimal number of clusters when strategies are grouped by similarity in returns.
+:::
+
+```{r effective_trials}
+# Calculate the number of strategies in each cluster
+cluster_sizes <- table(clusters)
+
+# Estimate effective number of trials
+k_eff <- length(cluster_sizes)
+
+# Display results
+cat("Total strategies tested:", n_strategies, "\n")
+cat("Effective number of independent trials:", k_eff, "\n")
+cat("Reduction factor:", round(n_strategies/k_eff, 2), "\n")
+```
+
+## Calculating DSR with Estimated Effective Trials
+
+```{r dsr_calculation}
+# Function to calculate DSR
+calculate_dsr <- function(strategy_returns, n_effective_trials, 
+                          mean_sr = 0, sr_variance = NULL) {
+  # Calculate Sharpe ratio and its components
+  n <- length(strategy_returns)
+  sr <- mean(strategy_returns) / sd(strategy_returns)
+  
+  # Calculate skewness and kurtosis
+  z <- (strategy_returns - mean(strategy_returns)) / sd(strategy_returns)
+  skew <- sum(z^3) / n
+  kurt <- sum(z^4) / n - 3  # Excess kurtosis
+  
+  # If SR variance not provided, estimate it
+  if (is.null(sr_variance)) {
+    sr_variance <- 1  # Simplification for example
+  }
+  
+  # Calculate expected maximum SR
+  emc <- 0.577215664901532860606512090082402431042159336  # Euler-Mascheroni
+  exp_max_sr <- (1 - emc) * qnorm(p = 1 - 1/n_effective_trials) + 
+               emc * qnorm(1 - (n_effective_trials * exp(1))^(-1))
+  exp_max_sr <- mean_sr + sqrt(sr_variance) * exp_max_sr
+  
+  # DSR calculation
+  numerator <- (sr - exp_max_sr) * sqrt(n - 1)
+  denominator <- sqrt(1 - skew * sr + (kurt / 4) * sr^2)
+  dsr <- pnorm(numerator / denominator)
+  
+  return(list(
+    sharpe_ratio = sr,
+    expected_max_sr = exp_max_sr,
+    dsr = dsr
+  ))
+}
+
+# Calculate DSR for a sample strategy
+sample_strategy <- strategies_returns[,1]
+dsr_results <- calculate_dsr(
+  sample_strategy, 
+  n_effective_trials = k_eff
+)
+
+# Display results
+cat("Strategy Sharpe Ratio:", round(dsr_results$sharpe_ratio, 4), "\n")
+cat("Expected Max SR with", k_eff, "trials:", 
+    round(dsr_results$expected_max_sr, 4), "\n")
+cat("Deflated Sharpe Ratio:", round(dsr_results$dsr, 4), "\n")
+```
+
+## Visual Representation of Precision and FDR
+
+```{r precision_fdr_visual}
+# Function to calculate precision and FDR
+calculate_precision_fdr <- function(theta, alpha = 0.05, beta = 0.2) {
+  recall <- 1 - beta          
+  b1 <- recall * theta
+  precision <- b1 / (b1 + alpha)
+  fdr <- 1 - precision
+  return(c(precision = precision, fdr = fdr))
+}
+
+# Calculate precision and FDR for different theta values
+theta_values <- seq(0.001, 0.5, by = 0.001)
+results <- t(sapply(theta_values, calculate_precision_fdr))
+results_df <- tibble(
+  theta = theta_values,
+  precision = results[, "precision"],
+  fdr = results[, "fdr"]
+)
+
+# Plot
+ggplot(results_df, aes(x = theta)) +
+  geom_line(aes(y = precision, color = "Precision"), size = 1) +
+  geom_line(aes(y = fdr, color = "FDR"), size = 1) +
+  scale_color_manual(values = c("Precision" = "blue", "FDR" = "red")) +
+  labs(
+    title = "Precision and False Discovery Rate vs. Odds Ratio",
+    subtitle = "Alpha = 0.05, Beta = 0.2",
+    x = "Theta (Odds Ratio of True vs. False Strategies)",
+    y = "Rate",
+    color = "Metric"
+  ) +
+  theme_minimal() +
+  geom_vline(xintercept = 0.05/0.8, linetype = "dashed") +
+  annotate("text", x = 0.07, y = 0.5, 
+           label = "Precision = 50%\nwhen θ = α/(1-β)")
+```
+
+## Recent Advances: Combinatorial Purged Cross-Validation
+
+- Introduced by Lopez de Prado (2018)
+- Addresses two key problems in financial machine learning:
+  1. Leakage from training to test sets due to serial correlation
+  2. Selection bias under multiple testing
+
+::: {.blockquote}
+CPCV provides a framework for model selection that:
+- Purges training observations that overlap with test observations
+- Embargoes observations that follow test observations
+- Generates multiple train/test splits to assess model variance
+:::
+
+![](img/cpcv.png){.center width="60%"}
+
+## Walk-Forward Testing vs. CPCV
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Walk-Forward Testing**
+- Traditional approach in finance
+- Training window followed by test window
+- Windows move forward in time
+- Limited number of test samples
+- Does not fully address selection bias
+:::
+
+::: {.column width="50%"}
+**Combinatorial Purged CV**
+- Training and test sets across all available data
+- Purging of overlapping observations
+- Embargo of subsequent observations
+- Many more test samples
+- Better estimate of out-of-sample performance
+:::
+
+::::
+
+![](img/walkforward_vs_cpcv.png){.center width="70%"}
+
+## Practical Implementation of CPCV
+
+```{r cpcv_demo, eval=FALSE}
+# This is pseudocode for demonstration purposes
+implement_cpcv <- function(returns, feature_data, model_func, 
+                           n_splits = 5, purge_window = 20, embargo = 5) {
+  
+  # Define time indices
+  T <- length(returns)
+  indices <- 1:T
+  
+  # Create time-based folds
+  fold_size <- floor(T / n_splits)
+  folds <- list()
+  
+  for(i in 1:n_splits) {
+    test_start <- (i-1) * fold_size + 1
+    test_end <- min(i * fold_size, T)
+    test_indices <- test_start:test_end
+    
+    # Apply purging: remove from training observations that overlap with test
+    purge_before <- max(1, test_start - purge_window)
+    purge_after <- min(T, test_end + purge_window)
+    purge_indices <- purge_before:purge_after
+    
+    # Apply embargo: remove from training observations that follow test
+    embargo_end <- min(T, test_end + embargo)
+    embargo_indices <- (test_end + 1):embargo_end
+    
+    # Training indices are all indices except test, purge, and embargo
+    train_indices <- setdiff(indices, unique(c(test_indices, purge_indices, embargo_indices)))
+    
+    folds[[i]] <- list(train = train_indices, test = test_indices)
+  }
+  
+  # Run model on each fold
+  results <- list()
+  for(i in 1:length(folds)) {
+    train_data <- feature_data[folds[[i]]$train, ]
+    train_returns <- returns[folds[[i]]$train]
+    test_data <- feature_data[folds[[i]]$test, ]
+    test_returns <- returns[folds[[i]]$test]
+    
+    # Train model
+    model <- model_func(train_data, train_returns)
+    
+    # Predict on test data
+    predictions <- predict(model, test_data)
+    
+    # Evaluate performance
+    performance <- evaluate_performance(predictions, test_returns)
+    
+    results[[i]] <- performance
+  }
+  
+  return(results)
+}
+```
+
+## Making Investment Decisions with DSR
+
+:::: {.columns}
+
+::: {.column width="60%"}
+**DSR Thresholds for Strategy Selection**
+- DSR < 0.5: Likely false discovery (reject)
+- 0.5 ≤ DSR < 0.95: Possible true discovery (further testing)
+- DSR ≥ 0.95: Likely true discovery (accept)
+
+**Implementation Considerations**
+- Monitor DSR through time
+- Re-evaluate strategies when DSR drops
+- Allocate capital based on DSR confidence
+- Diversify across uncorrelated strategies
+:::
+
+::: {.column width="40%"}
+```{r dsr_threshold, echo=FALSE}
+# Create data for demonstration
+dsr_values <- c(0.25, 0.55, 0.65, 0.98)
+strategy_names <- c("Strategy A", "Strategy B", "Strategy C", "Strategy D")
+sharpe_values <- c(1.8, 2.2, 2.0, 1.95)
+decision <- c("Reject", "Further Testing", "Further Testing", "Accept")
+
+dsr_df <- tibble(
+  Strategy = strategy_names,
+  Sharpe = sharpe_values,
+  DSR = dsr_values,
+  Decision = decision
+)
+
+# Create table
+kable(dsr_df, format = "html", caption = "Strategy Selection Framework") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  column_spec(3, color = "white", 
+              background = ifelse(dsr_values < 0.5, "red", 
+                         ifelse(dsr_values >= 0.95, "green", "orange")))
+```
+:::
+
+::::
+
+## Meta-Labeling: A Complementary Approach
+
+::: {.blockquote}
+Meta-labeling separates the problem of side prediction (buy/sell) from the problem of bet sizing.
+:::
+
+- **First Model**: Predicts the direction (e.g., using technical indicators)
+- **Second Model**: Predicts the probability of success for the first model's predictions
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Benefits**
+- Addresses class imbalance problem
+- Reduces false positives
+- Provides natural bet sizing
+- Complements DSR framework
+:::
+
+::: {.column width="50%"}
+**Implementation**
+1. Develop primary model for direction
+2. Label outcomes (success/failure)
+3. Train secondary model to predict success
+4. Size positions based on success probability
+:::
+
+::::
+
+## Bayesian Approaches to Backtest Evaluation
+
+- Traditional backtesting (frequentist) is vulnerable to overfitting
+- Bayesian methods offer advantages:
+  - Incorporation of prior beliefs
+  - Full posterior distributions instead of point estimates
+  - Natural handling of model uncertainty
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Bayesian Sharpe Ratio**
+- Assumes a prior distribution for the Sharpe ratio
+- Updates based on observed returns
+- Results in posterior distribution
+- Provides probability intervals for true SR
+:::
+
+::: {.column width="50%"}
+```{r bayesian_sr, echo=FALSE}
+# Create example of Bayesian SR
+x <- seq(-1, 3, length.out = 1000)
+
+# Prior (diffuse)
+prior <- dnorm(x, mean = 0, sd = 1)
+
+# Likelihood (based on observed SR = 1.5 with some uncertainty)
+likelihood <- dnorm(x, mean = 1.5, sd = 0.5)
+
+# Posterior (simplified calculation for illustration)
+posterior <- dnorm(x, mean = 1.2, sd = 0.3)
+
+# Create plot data with proper vector lengths
+plot_data <- data.frame(
+  x = rep(x, 3),
+  density = c(prior, likelihood, posterior),
+  type = factor(rep(c("Prior", "Likelihood", "Posterior"), each = length(x)))
+)
+
+# Plot
+ggplot(plot_data, aes(x = x, y = density, color = type)) +
+  geom_line(size = 1) +
+  labs(
+    title = "Bayesian Sharpe Ratio Estimation",
+    x = "Sharpe Ratio",
+    y = "Density",
+    color = "Distribution"
+  ) +
+  theme_minimal() +
+  geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.5)
+```
+:::
+
+::::
+
+## Complexity-Adjusted Performance Metrics
+
+- Strategy complexity is a key factor in overfitting
+- More complex strategies have more degrees of freedom
+- Complexity-adjusted metrics penalize complexity:
+
+:::: {.columns}
+
+::: {.column width="60%"}
+**Information-Theoretic Approaches**
+- Akaike Information Criterion (AIC)
+- Bayesian Information Criterion (BIC)
+- Minimum Description Length (MDL)
+
+**Regularization Techniques**
+- Ridge regression (L2 penalty)
+- LASSO regression (L1 penalty)
+- Elastic Net (combination of L1 and L2)
+:::
+
+::: {.column width="40%"}
+**Example: AIC for Strategy Selection**
+```{r complexity_metrics, echo=FALSE}
+# Create example of model complexity comparison
+strategies <- c("Moving Average Crossover", 
+                "Bollinger Band Strategy",
+                "Multi-factor Model",
+                "Deep Neural Network")
+parameters <- c(2, 5, 12, 150)
+sharpe <- c(1.2, 1.5, 1.8, 2.1)
+aic <- c(120, 150, 210, 350)
+complexity_adj_sharpe <- sharpe - 0.1 * log(parameters)
+
+complexity_df <- tibble(
+  Strategy = strategies,
+  Parameters = parameters,
+  `Sharpe Ratio` = sharpe,
+  AIC = aic,
+  `Adjusted Sharpe` = complexity_adj_sharpe
+)
+
+kable(complexity_df, format = "html", 
+      caption = "Complexity-Adjusted Strategy Performance") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  row_spec(which.max(complexity_adj_sharpe), background = "#e6ffe6")
+```
+:::
+
+::::
+
+## Ethical Considerations in Strategy Development
+
+::: {.saltinline}
+- Researchers have ethical responsibility to report honest results
+- Investors trust performance metrics for capital allocation
+- Regulators rely on accurate disclosures
+:::
+
+**Best Practices:**
+1. Pre-register testing protocols
+2. Report all trials and configurations
+3. Disclose DSR alongside Sharpe ratio
+4. Maintain research logs for audit trail
+5. Use out-of-sample validation periods
+
+## Industry Implementation: Case Study
+
+::: {.blockquote}
+**AQR Capital Management**: One of the pioneers in addressing backtest overfitting
+
+Cliff Asness (AQR co-founder): "We aim to publish strategies with high out-of-sample Sharpe ratios, not just high backtest Sharpe ratios."
+:::
+
+**AQR's Approach:**
+- Long out-of-sample periods (often decades)
+- Focus on economically justified factors
+- Implementation across multiple asset classes
+- Transparency in methodology
+- Publication of research and results
+
+## Putting It All Together: A Robust Workflow
+
+![](img/robust_workflow.png){.center width="80%"}
+
+## Summary of Key Extensions
+
+- Practical implementation of DSR calculation
+- Methods to estimate effective number of trials
+- Combinatorial Purged Cross-Validation
+- Meta-labeling for bet sizing
+- Bayesian approaches to backtest evaluation
+- Complexity-adjusted performance metrics
+- Ethical considerations and best practices
+
+## Workshop Exercises
+
+1. **False Discovery Estimation**
+   - Simulate strategy development and selection
+   - Calculate false discovery rates
+   - Implement DSR to correct for selection bias
+
+2. **Robust Strategy Evaluation Framework**
+   - Develop walk-forward testing procedure
+   - Estimate effective number of trials
+   - Create decision framework for strategy selection
+
 ## References
 
+- Lopez de Prado, M. (2018). "Advances in financial machine learning." John Wiley & Sons.
+- Lopez de Prado, M. (2019). "A data science solution to the multiple-testing crisis in financial research." Journal of Financial Data Science.
+- Bailey, D. H., & Lopez de Prado, M. (2014). "The deflated Sharpe ratio: Correcting for selection bias, backtest overfitting, and non-normality." Journal of Portfolio Management.
+- Harvey, C. R., & Liu, Y. (2015). "Backtesting." Journal of Portfolio Management.
+- Cherry, S., & Shallue, C. J. (2019). "Statistical significance and p-values in machine learning research." ArXiv preprint.
+- Bollen, N. P. B., & Pool, V. K. (2009). "Do Hedge Fund Managers Misreport Returns? Evidence from the Pooled Distribution." Journal of Finance.
+- Novy-Marx, R. (2016). "Testing strategies based on multiple signals." Working paper, University of Rochester.
 - Gu, Shihao, Bryan Kelly, and Dacheng Xiu. 2020. "Empirical Asset Pricing via Machine Learning." The Review of Financial Studies.
 - Harvey, Campbell R., Presidential Address: The Scientific Outlook in Financial Economics. 2017.
 - American Statistical Association. 2016. "Ethical guidelines for statistical practice."

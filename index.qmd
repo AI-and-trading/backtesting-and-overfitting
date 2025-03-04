@@ -859,6 +859,7 @@ CPCV provides a framework for model selection that:
 
 ::: {.column width="50%"}
 **Walk-Forward Testing**
+
 - Traditional approach in finance
 - Training window followed by test window
 - Windows move forward in time
@@ -868,6 +869,7 @@ CPCV provides a framework for model selection that:
 
 ::: {.column width="50%"}
 **Combinatorial Purged CV**
+
 - Training and test sets across all available data
 - Purging of overlapping observations
 - Embargo of subsequent observations
@@ -944,11 +946,13 @@ implement_cpcv <- function(returns, feature_data, model_func,
 
 ::: {.column width="60%"}
 **DSR Thresholds for Strategy Selection**
+
 - DSR < 0.5: Likely false discovery (reject)
 - 0.5 ≤ DSR < 0.95: Possible true discovery (further testing)
 - DSR ≥ 0.95: Likely true discovery (accept)
 
 **Implementation Considerations**
+
 - Monitor DSR through time
 - Re-evaluate strategies when DSR drops
 - Allocate capital based on DSR confidence
@@ -994,6 +998,7 @@ Meta-labeling separates the problem of side prediction (buy/sell) from the probl
 
 ::: {.column width="50%"}
 **Benefits**
+
 - Addresses class imbalance problem
 - Reduces false positives
 - Provides natural bet sizing
@@ -1002,6 +1007,7 @@ Meta-labeling separates the problem of side prediction (buy/sell) from the probl
 
 ::: {.column width="50%"}
 **Implementation**
+
 1. Develop primary model for direction
 2. Label outcomes (success/failure)
 3. Train secondary model to predict success
@@ -1022,6 +1028,7 @@ Meta-labeling separates the problem of side prediction (buy/sell) from the probl
 
 ::: {.column width="50%"}
 **Bayesian Sharpe Ratio**
+
 - Assumes a prior distribution for the Sharpe ratio
 - Updates based on observed returns
 - Results in posterior distribution
@@ -1075,11 +1082,13 @@ ggplot(plot_data, aes(x = x, y = density, color = type)) +
 
 ::: {.column width="60%"}
 **Information-Theoretic Approaches**
+
 - Akaike Information Criterion (AIC)
 - Bayesian Information Criterion (BIC)
 - Minimum Description Length (MDL)
 
 **Regularization Techniques**
+
 - Ridge regression (L2 penalty)
 - LASSO regression (L1 penalty)
 - Elastic Net (combination of L1 and L2)
@@ -1124,6 +1133,7 @@ kable(complexity_df, format = "html",
 :::
 
 **Best Practices:**
+
 1. Pre-register testing protocols
 2. Report all trials and configurations
 3. Disclose DSR alongside Sharpe ratio
@@ -1162,11 +1172,13 @@ Cliff Asness (AQR co-founder): "We aim to publish strategies with high out-of-sa
 ## Workshop Exercises
 
 1. **False Discovery Estimation**
+
    - Simulate strategy development and selection
    - Calculate false discovery rates
    - Implement DSR to correct for selection bias
 
 2. **Robust Strategy Evaluation Framework**
+
    - Develop walk-forward testing procedure
    - Estimate effective number of trials
    - Create decision framework for strategy selection
